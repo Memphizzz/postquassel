@@ -15,6 +15,7 @@ make -j$(nproc) && \
 make install && \
 rm /root/quassel-* -R
 RUN apt remove --purge gcc g++ cmake ccache zlib1g-dev qtdeclarative5-dev qtscript5-dev -y
+RUN apt install libqt5script5 libqt5network5 -y
 RUN apt autoremove -y
 RUN apt clean
 
