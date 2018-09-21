@@ -157,7 +157,7 @@ if [ "$1" = 'postgres' ]; then
 		echo
 		echo 'PostgreSQL init process complete; starting QuasselCore..'
 		echo
-		/usr/local/bin/quasselcore &
+		su -c 'quasselcore --configdir=/var/lib/postgresql/.config/quassel-irc.org/' postgres &
 	fi
 fi
 
