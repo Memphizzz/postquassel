@@ -20,7 +20,7 @@ RUN apt autoremove -y
 RUN apt clean
 
 COPY docker-entrypoint.sh /usr/local/bin/
-RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
+RUN ln -sf /usr/local/bin/docker-entrypoint.sh / # backwards compat
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
