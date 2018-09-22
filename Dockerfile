@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:10
 
 RUN pg_createcluster 10 main
 RUN apt update && \
