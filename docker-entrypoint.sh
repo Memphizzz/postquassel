@@ -45,6 +45,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 		chmod 700 "$POSTGRES_INITDB_WALDIR"
 	fi
 
+	#ToDo: make this a patch
 	exec gosu postgres bash -c '(/usr/local/bin/QuasselCoreHelper.sh &) && /docker-entrypoint.sh postgres'
 fi
 
