@@ -1,6 +1,6 @@
-FROM postgres:10
+FROM postgres:9
 
-RUN pg_createcluster 10 main
+RUN pg_createcluster 9.6 main
 RUN apt update && \
 apt install gcc g++ wget cmake ccache zlib1g-dev qtdeclarative5-dev qtscript5-dev libqt5sql5-psql -y
 RUN cd /root/ && \

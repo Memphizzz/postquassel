@@ -40,10 +40,10 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 	chmod 775 /var/run/postgresql
 
 	# Create the transaction log directory before initdb is run (below) so the directory is owned by the correct user
-	if [ "$POSTGRES_INITDB_WALDIR" ]; then
-		mkdir -p "$POSTGRES_INITDB_WALDIR"
-		chown -R postgres "$POSTGRES_INITDB_WALDIR"
-		chmod 700 "$POSTGRES_INITDB_WALDIR"
+	if [ "$POSTGRES_INITDB_XLOGDIR" ]; then
+		mkdir -p "$POSTGRES_INITDB_XLOGDIR"
+		chown -R postgres "$POSTGRES_INITDB_XLOGDIR"
+		chmod 700 "$POSTGRES_INITDB_XLOGDIR"
 	fi
 
 	#ToDo: make this a patch
@@ -71,8 +71,8 @@ if [ "$1" = 'postgres' ]; then
 		file_env 'POSTGRES_PASSWORD'
 
 		file_env 'POSTGRES_INITDB_ARGS'
-		if [ "$POSTGRES_INITDB_WALDIR" ]; then
-			export POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --waldir $POSTGRES_INITDB_WALDIR"
+		if [ "$POSTGRES_INITDB_XLOGDIR" ]; then
+			export POSTGRES_INITDB_ARGS="$POSTGRES_INITDB_ARGS --xlogdir $POSTGRES_INITDB_XLOGDIR"
 		fi
 		eval 'initdb --username="$POSTGRES_USER" --pwfile=<(echo "$POSTGRES_PASSWORD") '"$POSTGRES_INITDB_ARGS"
 
@@ -81,7 +81,6 @@ if [ "$1" = 'postgres' ]; then
 			rm -f "$NSS_WRAPPER_PASSWD" "$NSS_WRAPPER_GROUP"
 			unset LD_PRELOAD NSS_WRAPPER_PASSWD NSS_WRAPPER_GROUP
 		fi
-
 		# check password first so we can output the warning before postgres
 		# messes it up
 		if [ -n "$POSTGRES_PASSWORD" ]; then
@@ -121,7 +120,6 @@ if [ "$1" = 'postgres' ]; then
 
 		export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
 		psql=( psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --no-password )
-
 		if [ "$POSTGRES_DB" != 'postgres' ]; then
 			"${psql[@]}" --dbname postgres --set db="$POSTGRES_DB" <<-'EOSQL'
 				CREATE DATABASE :"db" ;
@@ -163,3 +161,4 @@ if [ "$1" = 'postgres' ]; then
 fi
 
 exec "$@"
+
