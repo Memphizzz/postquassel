@@ -45,7 +45,7 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
 		chmod 700 "$POSTGRES_INITDB_WALDIR"
 	fi
 
-	exec gosu postgres "$BASH_SOURCE" "$@"
+	exec gosu postgres bash -c '(/usr/local/bin/QuasselCoreHelper.sh &) && /docker-entrypoint.sh postgres'
 fi
 
 if [ "$1" = 'postgres' ]; then
@@ -155,9 +155,7 @@ if [ "$1" = 'postgres' ]; then
 		unset PGPASSWORD
 
 		echo
-		echo 'PostgreSQL init process complete; starting QuasselCore..'
-		echo
-		su -c 'quasselcore --configdir=/var/lib/postgresql/.config/quassel-irc.org/' postgres &
+		echo "PostgreSQL init process complete; QuasselCoreHelper taking over.."
 	fi
 fi
 
