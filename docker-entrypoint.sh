@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeo pipefail
+unset POSTGRES_READY
 # TODO swap to -Eeuo pipefail above (after handling all potentially-unset variables)
 
 # usage: file_env VAR [DEFAULT]
@@ -157,6 +158,7 @@ if [ "$1" = 'postgres' ]; then
 
 		echo
 		echo "PostgreSQL init process complete; QuasselCoreHelper taking over.."
+		export POSTGRES_READY=true
 	fi
 fi
 

@@ -1,5 +1,10 @@
-echo "QuasselCoreHelper: ready/waiting.."
-sleep 10s
+echo "QuasselCoreHelper: initializing.."
+while [ -z ${POSTGRES_READY+x} ]
+do 
+    echo "QuasselCoreHelper: ready/waiting.."
+    sleep 5s    
+done 
+
 while :
 do
     echo "QuasselCoreHelper: Connecting to database.."
