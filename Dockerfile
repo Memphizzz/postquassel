@@ -5,9 +5,10 @@ FROM phusion/baseimage:0.11
 #docker run YOUR_IMAGE /sbin/my_init --help # HELP
 
 ### DEV
-RUN apt update && apt install -y postgresql-common && echo 'create_main_cluster = false' >> /etc/postgresql-common/createcluster.conf && \
+RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
+apt install -y postgresql-common && \
+echo 'create_main_cluster = false' >> /etc/postgresql-common/createcluster.conf && \
 apt install -y wget nano curl htop postgresql-10 quassel-core libqt5sql5-psql
-RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
 RUN apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN rm /var/lib/quassel/quasselCert.pem
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /var/lib/quassel/quasselCert.pem -out /var/lib/quassel/quasselCert.pem -subj "/C=DE/ST=X/L=X/O=X/OU=X/CN=X"
