@@ -1,19 +1,22 @@
-FROM postgres:10
+FROM phusion/baseimage:0.11
+#RUN echo VAR-VALUE > /etc/container_environment/VAR_NAME # HowTo pass env-var to my_init
+#RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold" # HowTo dist-upgrade
+#docker run phusion/baseimage:<VERSION> /sbin/my_init -- ls #TESTCOMMAND
+#docker run YOUR_IMAGE /sbin/my_init --help # HELP
 
-RUN pg_createcluster 10 main
-RUN apt update && apt install nano wget quassel-core libqt5sql5-psql -y
+### DEV
+RUN apt update && apt install -y wget nano curl htop postgresql-10 quassel-core libqt5sql5-psql
+RUN apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN rm /var/lib/quassel/quasselCert.pem
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /var/lib/quassel/quasselCert.pem -out /var/lib/quassel/quasselCert.pem -subj "/C=DE/ST=X/L=X/O=X/OU=X/CN=X"
-RUN echo 'false' > /var/lib/quassel/POSTGRES_READY && chmod ug+rw /var/lib/quassel/POSTGRES_READY
-RUN chown quasselcore:postgres /var/lib/quassel/ -R
-RUN adduser postgres quassel
-RUN adduser quasselcore postgres
+RUN chown quasselcore:quassel /var/lib/quassel/ -R
+RUN su -s /bin/bash -c "/etc/init.d/postgresql start && \
+echo \"CREATE USER quassel WITH PASSWORD 'quassel'; CREATE DATABASE quassel OWNER quassel; GRANT ALL PRIVILEGES ON DATABASE quassel TO quassel;\" > /tmp/postquassel.sql && \
+psql -f /tmp/postquassel.sql && /etc/init.d/postgresql stop" postgres
 
-COPY docker-entrypoint-postgres10.sh /usr/local/bin/docker-entrypoint.sh
-RUN ln -sf /usr/local/bin/docker-entrypoint.sh / # backwards compat
-COPY QuasselCoreHelper.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 5432
+COPY postquassel.sh /etc/my_init.d/
+COPY apostquassel.sh /etc/my_init.d/
+
 EXPOSE 4242
-CMD ["postgres"]
+CMD ["/sbin/my_init"]

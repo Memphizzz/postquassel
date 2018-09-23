@@ -22,8 +22,8 @@ do
 			psql -h localhost -U admin -c "GRANT ALL PRIVILEGES ON DATABASE quassel TO $POSTGRES_USER" >/dev/null 2>&1
 		else
 			echo "QuasselCoreHelper: Database is up!, starting QuasselCore.."
-			/usr/bin/quasselcore --configdir=/var/lib/quassel/
-			kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)
+			/usr/local/bin/quasselcore --configdir=/var/lib/quassel/ &
+			#kill -INT $(head -1 /var/lib/postgresql/data/postmaster.pid)
 			break
 		fi
 	fi
