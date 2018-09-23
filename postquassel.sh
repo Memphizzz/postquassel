@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
+echo "[postquassel]: .sh"
 
-if [[ $(pg_lsclusters) != *"online"* ]]; then
-	echo "[postquassel]: Database is not available!"
-	exit -1
+if [[ $(pg_lsclusters) != *10*main* ]]; then
+	echo "[postquassel]: Main cluster is not available, initializing cluster and database.."
+	pg_createcluster 10 main
+	/etc/init.d/postgresql restart
+	pg_lsclusters
+	echo "CREATE USER quassel WITH PASSWORD 'quassel'; CREATE DATABASE quassel OWNER quassel; GRANT ALL PRIVILEGES ON DATABASE quassel TO quassel;" > /tmp/postquassel.sql
+	su -s /bin/bash -c "psql -f /tmp/postquassel.sql" postgres
 fi
 
-if
-	db_exists=$(PGPASSWORD=quassel psql -h localhost -U quassel -lqt quassel)
-	exitcode=$?
-	if [ $exitcode -ne 0 ]; then
-		echo echo "[postquassel]: Database 'quassel' does not exist!"
-		exit 404
-	else
-		echo "[postquassel]: Database is up, starting QuasselCore.."
-		exec /etc/init.d/quasselcore start
-	fi
-	break
+db_exists=$(PGPASSWORD=quassel psql -h localhost -U quassel -lqt quassel)
+exitcode=$?
+if [ $exitcode -ne 0 ]; then
+	echo "[postquassel]: ERROR"
+	exit 100
+else
+	echo "[postquassel]: enable logging for quassel/core.log.."
+	/bin/bash -c "tail -n 1 -F /var/log/quassel/core.log" &
+
+	echo "[postquassel]: Database is ready, starting QuasselCore.."
+	exec /etc/init.d/quasselcore start
 fi
